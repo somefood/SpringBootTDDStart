@@ -31,6 +31,10 @@ public record SellerSignUpController() {
             return ResponseEntity.badRequest().build();
         } else if (command.username().matches(usernameRex) == false) {
             return ResponseEntity.badRequest().build();
+        } else if (command.password() == null) {
+            return ResponseEntity.badRequest().build();
+        } else if (command.password().length() < 8) {
+            return ResponseEntity.badRequest().build();
         } else {
             return ResponseEntity.noContent().build();
         }
