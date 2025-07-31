@@ -17,7 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static test.commerce.EmailGenerator.generateEmail;
 import static test.commerce.UsernameGenerator.generateUsername;
-import static test.commerce.api.seller.signup.PasswordGenerator.generatePassword;
+import static test.commerce.PasswordGenerator.generatePassword;
 
 @SpringBootTest(
     classes = CommerceApiApp.class,
