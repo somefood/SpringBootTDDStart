@@ -1,13 +1,16 @@
 package commerce.api.controller;
 
+import commerce.Seller;
+import commerce.SellerRepository;
 import commerce.command.CreateSellerCommand;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public record SellerSignUpController() {
+public record SellerSignUpController(SellerRepository repository) {
 
     private static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
     private static final String USERNAME_REX = "^[a-zA-Z0-9_-]{3,}$";
@@ -17,7 +20,16 @@ public record SellerSignUpController() {
         if (isCommandValid(command) == false) {
             return ResponseEntity.badRequest().build();
         }
-        
+
+        var seller = new Seller();
+        seller.setEmail(command.email());
+
+        try {
+            repository.save(seller);
+        } catch (DataIntegrityViolationException exception) {
+            return ResponseEntity.badRequest().build();
+        }
+
         return ResponseEntity.noContent().build();
     }
 
