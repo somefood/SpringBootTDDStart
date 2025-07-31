@@ -1,4 +1,4 @@
-package test.commerce.api.seller.signup;
+package test.commerce;
 
 import java.util.UUID;
 
