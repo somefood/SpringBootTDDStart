@@ -13,16 +13,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import test.commerce.api.CommerceApiTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static test.commerce.EmailGenerator.generateEmail;
 import static test.commerce.UsernameGenerator.generateUsername;
 import static test.commerce.PasswordGenerator.generatePassword;
 
-@SpringBootTest(
-    classes = CommerceApiApp.class,
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
-)
+@CommerceApiTest
 @DisplayName("POST /seller/signUp")
 public class POST_specs {
     
