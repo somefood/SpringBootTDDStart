@@ -12,14 +12,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import static commerce.UserPropertyValidator.isEmailValid;
+import static commerce.UserPropertyValidator.isUsernameValid;
 
 @RestController
 public record SellerSignUpController(
     PasswordEncoder passwordEncoder,
     SellerRepository repository
 ) {
-
-    private static final String USERNAME_REX = "^[a-zA-Z0-9_-]{3,}$";
 
     @PostMapping("/seller/signUp")
     ResponseEntity<?> signUp(@RequestBody CreateSellerCommand command) {
@@ -46,10 +45,6 @@ public record SellerSignUpController(
         return isEmailValid(command.email())
             && isUsernameValid(command.username())
             && isPasswordValid(command.password());
-    }
-
-    private static boolean isUsernameValid(String username) {
-        return username != null && username.matches(USERNAME_REX);
     }
 
     private static boolean isPasswordValid(String password) {
