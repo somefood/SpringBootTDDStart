@@ -10,8 +10,11 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
 import test.commerce.api.CommerceApiTest;
 
+import java.util.Objects;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static test.commerce.EmailGenerator.generateEmail;
+import static test.commerce.JwtAssertions.conformsToJwtFormat;
 import static test.commerce.PasswordGenerator.generatePassword;
 import static test.commerce.UsernameGenerator.generateUsername;
 
@@ -44,5 +47,76 @@ public class POST_specs {
         assertThat(response.getStatusCode().value()).isEqualTo(200);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().accessToken()).isNotNull();
+    }
+    
+    @Test
+    void 접근_토큰은_JWT_형식을_따른다(
+        @Autowired TestRestTemplate client
+    ) {
+        // Arrange
+        String email = generateEmail();
+        String password = generatePassword();
+        
+        client.postForEntity(
+            "/shopper/signUp",
+            new CreateShopperCommand(email, generateUsername(), password),
+            Void.class
+        );
+        
+        // Act
+        ResponseEntity<AccessTokenCarrier> response = client.postForEntity(
+            "/shopper/issueToken",
+            new IssueShopperToken(email, password),
+            AccessTokenCarrier.class
+        );
+        
+        // Assert
+        String actual = Objects.requireNonNull(response.getBody()).accessToken();
+        assertThat(actual).satisfies(conformsToJwtFormat());
+    }
+    
+    @Test
+    void 존재하지_않는_이메일_주소가_사용되면_400_Bad_Request_상태코드를_반환한다(
+        @Autowired TestRestTemplate client
+    ) {
+        // Arrange
+        String email = generateEmail();
+        String password = generatePassword();
+        
+        // Act
+        ResponseEntity<AccessTokenCarrier> response = client.postForEntity(
+            "/shopper/issueToken",
+            new IssueShopperToken(email, password),
+            AccessTokenCarrier.class
+        );
+        
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+    
+    @Test
+    void 잘못된_비밀번호가_사용되면_400_Bad_Request_상태코드를_반환한다(
+        @Autowired TestRestTemplate client
+    ) {
+        // Arrange
+        String email = generateEmail();
+        String password = generatePassword();
+        String wrongPassword = generatePassword();
+
+        client.postForEntity(
+            "/shopper/signUp",
+            new CreateShopperCommand(email, generateUsername(), password),
+            Void.class
+        );
+
+        // Act
+        ResponseEntity<AccessTokenCarrier> response = client.postForEntity(
+            "/shopper/issueToken",
+            new IssueShopperToken(email, wrongPassword),
+            AccessTokenCarrier.class
+        );
+        
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
 }
