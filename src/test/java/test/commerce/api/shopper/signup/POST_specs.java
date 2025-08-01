@@ -1,4 +1,4 @@
-package test.commerce.shopper.signup;
+package test.commerce.api.shopper.signup;
 
 import commerce.command.CreateShopperCommand;
 import org.junit.jupiter.api.DisplayName;
