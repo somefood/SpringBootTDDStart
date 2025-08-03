@@ -8,7 +8,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import test.commerce.api.CommerceApiTest;
 
@@ -51,5 +50,19 @@ public class GET_specs {
 
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(200);
+    }
+
+    @Test
+    void 접근_토큰을_사용하지_않으면_401_Unauthorized_상태코드를_반환한다(
+        @Autowired TestRestTemplate client
+    ) {
+        // Act
+        ResponseEntity<Void> response = client.getForEntity(
+            "/seller/me",
+            Void.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(401);
     }
 }
