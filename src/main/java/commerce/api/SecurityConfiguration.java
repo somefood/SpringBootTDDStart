@@ -47,6 +47,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/seller/me").authenticated()
                 .requestMatchers("/shopper/signUp").permitAll()
                 .requestMatchers("/shopper/issueToken").permitAll()
+                .requestMatchers("/shopper/me").permitAll()
             )
             .build();
     }
