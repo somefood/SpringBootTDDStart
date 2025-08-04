@@ -26,7 +26,9 @@ public record SellerProductsController(SellerRepository repository) {
         } else if (isValidUri(command.imageUri()) == false) {
             return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+
+        URI location = URI.create("/seller/products/" + UUID.randomUUID());
+        return ResponseEntity.created(location).build();
     }
 
     private boolean isValidUri(String value) {
