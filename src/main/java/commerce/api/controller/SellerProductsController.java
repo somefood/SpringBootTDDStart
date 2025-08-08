@@ -7,6 +7,7 @@ import java.util.UUID;
 import commerce.Product;
 import commerce.ProductRepository;
 import commerce.command.RegisterProductCommand;
+import commerce.view.SellerProductView;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +31,11 @@ public record SellerProductsController(ProductRepository repository) {
         var product = new Product();
         product.setId(id);
         product.setSellerId(UUID.fromString(user.getName()));
+        product.setName(command.name());
+        product.setImageUrl(command.imageUri());
+        product.setDescription(command.description());
+        product.setPriceAmount(command.priceAmount());
+        product.setStockQuantity(command.stockQuantity());
         repository.save(product);
         URI location = URI.create("/seller/products/" + id);
         return ResponseEntity.created(location).build();
@@ -50,7 +56,16 @@ public record SellerProductsController(ProductRepository repository) {
         return repository
             .findById(id)
             .filter(product -> product.getSellerId().equals(sellerId))
-            .map(product -> ResponseEntity.ok().build())
+            .map(product -> new SellerProductView(
+                product.getId(),
+                product.getName(),
+                product.getImageUrl(),
+                product.getDescription(),
+                product.getPriceAmount(),
+                product.getStockQuantity(),
+                null
+            ))
+            .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

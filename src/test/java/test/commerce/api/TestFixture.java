@@ -2,6 +2,7 @@ package test.commerce.api;
 
 import commerce.command.CreateSellerCommand;
 import commerce.command.CreateShopperCommand;
+import commerce.command.RegisterProductCommand;
 import commerce.query.IssueSellerToken;
 import commerce.query.IssueShopperToken;
 import commerce.result.AccessTokenCarrier;
@@ -101,9 +102,13 @@ public record TestFixture(TestRestTemplate client) {
     }
 
     public UUID registerProduct() {
+        return registerProduct(generateRegisterProductCommand());
+    }
+
+    public UUID registerProduct(RegisterProductCommand command) {
         ResponseEntity<Void> response = client.postForEntity(
             "/seller/products",
-            generateRegisterProductCommand(),
+            command,
             Void.class
         );
         URI location = response.getHeaders().getLocation();

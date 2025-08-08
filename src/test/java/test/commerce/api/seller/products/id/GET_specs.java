@@ -1,5 +1,6 @@
 package test.commerce.api.seller.products.id;
 
+import commerce.command.RegisterProductCommand;
 import commerce.view.SellerProductView;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,8 @@ import test.commerce.api.TestFixture;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static test.commerce.ProductAssertions.isDerivedFrom;
+import static test.commerce.RegisterProductCommandGenerator.generateRegisterProductCommand;
 
 @CommerceApiTest
 @DisplayName("GET /seller/products/{id}")
@@ -90,5 +93,43 @@ public class GET_specs {
 
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(404);
+    }
+    
+    @Test
+    void 상품_식별자를_올바르게_반환한다(
+        @Autowired TestFixture fixture
+    ) {
+        // Arrange
+        fixture.createSellerThenSetAsDefaultUser();
+        UUID id = fixture.registerProduct();
+        
+        // Act
+        SellerProductView actual = fixture.client().getForObject(
+            "/seller/products/" + id,
+            SellerProductView.class
+        );
+
+        // Assert
+        assertThat(actual.id()).isNotNull();
+        assertThat(actual.id()).isEqualTo(id);
+    }
+    
+    @Test
+    void 상품_정보를_올바르게_반환한다(
+        @Autowired TestFixture fixture
+    ) {
+        // Arrange
+        fixture.createSellerThenSetAsDefaultUser();
+        RegisterProductCommand command = generateRegisterProductCommand();
+        UUID id = fixture.registerProduct(command);
+        
+        // Act
+        SellerProductView actual = fixture.client().getForObject(
+            "/seller/products/" + id,
+            SellerProductView.class
+        );
+
+        // Assert
+        assertThat(actual).satisfies(isDerivedFrom(command));
     }
 }
