@@ -59,4 +59,27 @@ public class GET_specs {
             .extracting(SellerProductView::id)
             .containsAll(ids);
     }
+    
+    @Test
+    void 다른_판매자가_등록한_상품이_포함되지_않는다(
+        @Autowired TestFixture fixture
+    ) {
+        // Arrange
+        fixture.createSellerThenSetAsDefaultUser();
+        UUID unexpected = fixture.registerProduct();
+        
+        fixture.createSellerThenSetAsDefaultUser();
+        fixture.registerProducts();
+        
+        // Act
+        ResponseEntity<ArrayCarrier<SellerProductView>> response = fixture.client().exchange(
+            get("/seller/products").build(),
+            new ParameterizedTypeReference<>() { }
+        );
+        
+        // Assert
+        assertThat(response.getBody().items())
+            .extracting(SellerProductView::id)
+            .doesNotContain(unexpected);
+    }
 }
