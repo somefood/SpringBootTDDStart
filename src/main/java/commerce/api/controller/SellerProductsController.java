@@ -62,15 +62,7 @@ public record SellerProductsController(ProductRepository repository) {
         return repository
             .findById(id)
             .filter(product -> product.getSellerId().equals(sellerId))
-            .map(product -> new SellerProductView(
-                product.getId(),
-                product.getName(),
-                product.getImageUrl(),
-                product.getDescription(),
-                product.getPriceAmount(),
-                product.getStockQuantity(),
-                product.getRegisteredTimeUtc()
-            ))
+            .map(SellerProductsController::convertToView)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -81,16 +73,20 @@ public record SellerProductsController(ProductRepository repository) {
         SellerProductView[] items = repository
             .findBySellerId(sellerId)
             .stream()
-            .map(product -> new SellerProductView(
-                product.getId(),
-                null,
-                null,
-                null,
-                null,
-                0,
-                null
-            ))
+            .map(SellerProductsController::convertToView)
             .toArray(SellerProductView[]::new);
         return ResponseEntity.ok(new ArrayCarrier<>(items));
+    }
+
+    private static SellerProductView convertToView(Product product) {
+        return new SellerProductView(
+            product.getId(),
+            product.getName(),
+            product.getImageUrl(),
+            product.getDescription(),
+            product.getPriceAmount(),
+            product.getStockQuantity(),
+            product.getRegisteredTimeUtc()
+        );
     }
 }
