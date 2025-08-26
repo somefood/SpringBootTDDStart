@@ -2,6 +2,7 @@ package test.commerce.api.seller.products;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -19,6 +20,7 @@ import test.commerce.api.TestFixture;
 
 import static java.time.ZoneOffset.UTC;
 import static java.time.temporal.ChronoUnit.SECONDS;
+import static java.util.Comparator.reverseOrder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.springframework.http.RequestEntity.get;
@@ -133,5 +135,25 @@ public class GET_specs {
         SellerProductView actual = Objects.requireNonNull(body).items()[0];
         assertThat(actual.registeredTimeUtc())
             .isCloseTo(referenceTime, within(1, SECONDS));
+    }
+    
+    @Test
+    void 상품_목록을_등록_시점_역순으로_정렬한다(
+        @Autowired TestFixture fixture
+    ) {
+        // Arrange
+        fixture.createSellerThenSetAsDefaultUser();
+        fixture.registerProducts();
+
+        // Act
+        ResponseEntity<ArrayCarrier<SellerProductView>> response = fixture.client().exchange(
+            get("/seller/products").build(),
+            new ParameterizedTypeReference<>() { }
+        );
+
+        // Assert
+        assertThat(Objects.requireNonNull(response.getBody()).items())
+            .extracting(SellerProductView::registeredTimeUtc)
+            .isSortedAccordingTo(reverseOrder());
     }
 }
