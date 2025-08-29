@@ -25,6 +25,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static java.util.Objects.requireNonNull;
+import static org.springframework.http.RequestEntity.get;
 import static test.commerce.EmailGenerator.generateEmail;
 import static test.commerce.PasswordGenerator.generatePassword;
 import static test.commerce.RegisterProductCommandGenerator.generateRegisterProductCommand;
@@ -151,9 +152,18 @@ public record TestFixture(
 
     public String consumeProductPage() {
         ResponseEntity<PageCarrier<ProductView>> response = client.exchange(
-            RequestEntity.get("/shopper/products").build(),
+            get("/shopper/products").build(),
             new ParameterizedTypeReference<>() { }
         );
         return requireNonNull(response.getBody()).continuationToken();
+    }
+
+    public String consumeTwoProductPages() {
+        String token = consumeProductPage();
+        ResponseEntity<PageCarrier<ProductView>> response = client.exchange(
+            get("/shopper/products?continuationToken=" + token).build(),
+            new ParameterizedTypeReference<>() { }
+        );
+        return requireNonNull(response.getBody()).continuationToken(); 
     }
 }
