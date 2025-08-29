@@ -3,13 +3,12 @@ package commerce.api.controller;
 import java.net.URI;
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.UUID;
 
 import commerce.Product;
 import commerce.ProductRepository;
 import commerce.command.RegisterProductCommand;
-import commerce.view.ArrayCarrier;
+import commerce.result.ArrayCarrier;
 import commerce.view.SellerProductView;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,14 +1,12 @@
 package test.commerce.api.seller.products;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
 import commerce.command.RegisterProductCommand;
-import commerce.view.ArrayCarrier;
+import commerce.result.ArrayCarrier;
 import commerce.view.SellerProductView;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
