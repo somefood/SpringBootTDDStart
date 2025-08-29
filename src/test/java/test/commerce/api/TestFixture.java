@@ -1,5 +1,6 @@
 package test.commerce.api;
 
+import commerce.ProductRepository;
 import commerce.command.CreateSellerCommand;
 import commerce.command.CreateShopperCommand;
 import commerce.command.RegisterProductCommand;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -23,13 +25,16 @@ import static test.commerce.PasswordGenerator.generatePassword;
 import static test.commerce.RegisterProductCommandGenerator.generateRegisterProductCommand;
 import static test.commerce.UsernameGenerator.generateUsername;
 
-public record TestFixture(TestRestTemplate client) {
+public record TestFixture(
+    TestRestTemplate client,
+    ProductRepository productRepository
+) {
 
-    public static TestFixture create(Environment environment) {
+    public static TestFixture create(Environment environment, ProductRepository productRepository) {
         var client = new TestRestTemplate();
         var uriTemplateHandler = new LocalHostUriTemplateHandler(environment);
         client.setUriTemplateHandler(uriTemplateHandler); // host 생략하고 상대경로로
-        return new TestFixture(client);
+        return new TestFixture(client, productRepository);
     }
 
     public void createShopper(String email, String username, String password) {
@@ -120,5 +125,18 @@ public record TestFixture(TestRestTemplate client) {
 
     public List<UUID> registerProducts() {
         return List.of(registerProduct(), registerProduct(), registerProduct());
+    }
+
+    public void deleteAllProducts() {
+        productRepository.deleteAll();
+    }
+
+    public List<UUID> registerProducts(int count) {
+        List<UUID> ids = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            ids.add(registerProduct());
+        }
+        
+        return ids;
     }
 }
