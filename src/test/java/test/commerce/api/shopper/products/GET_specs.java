@@ -3,6 +3,8 @@ package test.commerce.api.shopper.products;
 import commerce.command.RegisterProductCommand;
 import commerce.result.PageCarrier;
 import commerce.view.ProductView;
+import commerce.view.SellerMeView;
+import commerce.view.SellerView;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.RequestEntity.get;
 import static test.commerce.ProductAssertions.isViewDerivedFrom;
@@ -109,7 +112,7 @@ public class GET_specs {
             );
 
         // Assert
-        assertThat(Objects.requireNonNull(response.getBody()).items())
+        assertThat(requireNonNull(response.getBody()).items())
             .extracting(ProductView::id)
             .containsExactly(id3, id2, id1);
     }
@@ -135,7 +138,35 @@ public class GET_specs {
             );
 
         // Assert
-        ProductView actual = Objects.requireNonNull(response.getBody()).items()[0];
+        ProductView actual = requireNonNull(response.getBody()).items()[0];
         assertThat(actual).satisfies(isViewDerivedFrom(command));
+    }
+    
+    @Test
+    void 판매자_정보를_올바르게_반환한다(
+        @Autowired TestFixture fixture
+    ) {
+        // Arrange
+        fixture.deleteAllProducts();
+        
+        fixture.createSellerThenSetAsDefaultUser();
+        SellerMeView seller = fixture.getSeller();
+        fixture.registerProduct();
+        
+        fixture.createShopperThenSetAsDefaultUser();
+
+        // Act
+        ResponseEntity<PageCarrier<ProductView>> response =
+            fixture.client().exchange(
+                get("/shopper/products").build(),
+                new ParameterizedTypeReference<>() { }
+            );
+
+        // Assert
+        PageCarrier<ProductView> body = response.getBody();
+        SellerView actual = requireNonNull(body).items()[0].seller();
+        assertThat(actual).isNotNull();
+        assertThat(actual.id()).isEqualTo(seller.id());
+        assertThat(actual.username()).isEqualTo(seller.username());
     }
 }
