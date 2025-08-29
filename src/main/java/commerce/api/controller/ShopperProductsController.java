@@ -1,10 +1,15 @@
 package commerce.api.controller;
 
+import commerce.Product;
 import commerce.ProductRepository;
 import commerce.result.PageCarrier;
 import commerce.view.ProductView;
+import commerce.view.SellerView;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.reverseOrder;
 
 @RestController
 public record ShopperProductsController(ProductRepository repository) {
@@ -14,14 +19,15 @@ public record ShopperProductsController(ProductRepository repository) {
         ProductView[] items = repository
             .findAll()
             .stream()
+            .sorted(comparing(Product::getDataKey, reverseOrder()))
             .map(product -> new ProductView(
                 product.getId(),
                 null,
-                null,
-                null,
-                null,
-                null,
-                0
+                product.getName(),
+                product.getImageUrl(),
+                product.getDescription(), 
+                product.getPriceAmount(),
+                product.getStockQuantity()
             ))
             .toArray(ProductView[]::new);
         
