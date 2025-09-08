@@ -34,7 +34,8 @@ public class POST_specs {
         var command = new CreateSellerCommand(
             generateEmail(),
             generateUsername(),
-            "password"
+            "password",
+            generateEmail()
         );
 
         // Act
@@ -56,7 +57,8 @@ public class POST_specs {
         var command = new CreateSellerCommand(
             null,  // email 속성 없음
             generateUsername(),
-            "password"
+            "password",
+            generateEmail()
         );
 
         // Act
@@ -86,7 +88,8 @@ public class POST_specs {
         var command = new CreateSellerCommand(
             invalidEmail,  // 잘못된 형식의 email
             generateUsername(),
-            "password"
+            "password",
+            generateEmail()
         );
 
         // Act
@@ -108,7 +111,8 @@ public class POST_specs {
         var command = new CreateSellerCommand(
             generateEmail(),
             null,
-            "password"
+            "password",
+            generateEmail()
         );
         
         // Act
@@ -139,7 +143,8 @@ public class POST_specs {
         var command = new CreateSellerCommand(
             generateEmail(),
             username,
-            "password"
+            "password",
+            generateEmail()
         );
         
         // Act
@@ -165,7 +170,8 @@ public class POST_specs {
         var command = new CreateSellerCommand(
             generateEmail(),
             username,
-            "password"
+            "password",
+            generateEmail()
         );
         
         // Act
@@ -187,7 +193,8 @@ public class POST_specs {
         var command = new CreateSellerCommand(
             generateEmail(),
             generateUsername(),
-            null
+            null,
+            generateEmail()
         );
         
         // Act
@@ -211,7 +218,8 @@ public class POST_specs {
         var command = new CreateSellerCommand(
             generateEmail(),
             generateUsername(),
-            password
+            password,
+            generateEmail()
         );
 
         // Act
@@ -234,14 +242,24 @@ public class POST_specs {
 
         client.postForEntity(
             "/seller/signUp",
-            new CreateSellerCommand(email, generateUsername(), "password"),
+            new CreateSellerCommand(
+                email,
+                generateUsername(),
+                "password",
+                generateEmail()
+            ),
             Void.class
         );
         
         // Act
         ResponseEntity<Void> response = client.postForEntity(
             "/seller/signUp",
-            new CreateSellerCommand(email, generateUsername(), "password"),
+            new CreateSellerCommand(
+                email,
+                generateUsername(),
+                "password",
+                generateEmail()
+            ),
             Void.class
         );
         
@@ -258,14 +276,24 @@ public class POST_specs {
 
         client.postForEntity(
             "/seller/signUp",
-            new CreateSellerCommand(generateEmail(), username, "password"),
+            new CreateSellerCommand(
+                generateEmail(),
+                username,
+                "password",
+                generateEmail()
+            ),
             Void.class
         );
         
         // Act
         ResponseEntity<Void> response = client.postForEntity(
             "/seller/signUp",
-            new CreateSellerCommand(generateEmail(), username, "password"),
+            new CreateSellerCommand(
+                generateEmail(),
+                username,
+                "password",
+                generateEmail()
+            ),
             Void.class
         );
 
@@ -283,7 +311,8 @@ public class POST_specs {
         var command = new CreateSellerCommand(
             generateEmail(),
             generateUsername(),
-            generatePassword()
+            generatePassword(),
+            generateEmail()
         );
 
         // Act
