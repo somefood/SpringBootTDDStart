@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
 import test.commerce.api.CommerceApiTest;
+import test.commerce.api.TestFixture;
 
 import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -221,5 +222,37 @@ public class GET_specs {
         SellerMeView body = requireNonNull(response.getBody());
         assertThat(body.email()).isEqualTo(email);
         assertThat(body.username()).isEqualTo(username);
+    }
+
+    @Test
+    void 문의_이메일_주소를_올바르게_설정한다(
+        @Autowired TestFixture fixture
+    ) {
+        // Arrange
+        String email = generateEmail();
+        String username = generateUsername();
+        String password = generatePassword();
+        String contactEmail = generateEmail();
+
+        fixture.createSeller(email, username, password, contactEmail);
+
+        AccessTokenCarrier carrier = fixture.client().postForObject(
+            "/seller/issueToken",
+            new IssueSellerToken(email, password),
+            AccessTokenCarrier.class
+        );
+        String token = carrier.accessToken();
+
+        // Act
+        ResponseEntity<SellerMeView> response = fixture.client().exchange(
+            get("/seller/me")
+                .header("Authorization", "Bearer " + token)
+                .build(),
+            SellerMeView.class
+        );
+
+        // Assert
+        SellerMeView actual = requireNonNull(response.getBody());
+        assertThat(actual.contactEmail()).isEqualTo(contactEmail);
     }
 }
